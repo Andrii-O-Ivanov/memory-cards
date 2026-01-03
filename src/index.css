@@ -1,59 +1,145 @@
 :root {
-  font-family: Inter, system-ui, sans-serif;
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   background-color: #242424;
-  color: white;
-  text-align: center;
+  color: rgba(255, 255, 255, 0.87);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
 }
 
 body {
-  margin: 0;
   display: flex;
   justify-content: center;
-  min-height: 100vh;
+  margin: 0;
+  width: 100%;
 }
 
 .app {
-  padding: 2rem;
   width: 100%;
-  max-width: 600px;
+  max-width: 480px;
+  background-color: #1a1a1a;
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+  border: 1px solid #333;
+  
+  height: 550px; 
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
 }
+
+.page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+
+h1 {
+  font-size: 2.5em;
+  margin-bottom: 0.5em;
+  color: #646cff;
+}
+
+p {
+  font-size: 1.2em;
+  margin-bottom: 2em;
+  color: #aaa;
+}
+
 
 button {
   background-color: #646cff;
   color: white;
   border: none;
-  padding: 10px 20px;
+  padding: 12px 30px;
   font-size: 1.2em;
+  font-weight: bold;
   border-radius: 8px;
   cursor: pointer;
-  transition: 0.3s;
+  transition: all 0.2s;
+  box-shadow: 0 4px 15px rgba(100, 108, 255, 0.4);
 }
 
 button:hover {
   background-color: #535bf2;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(100, 108, 255, 0.6);
 }
 
-/* Сітка для карток */
+
 .grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr); /* 4 колонки */
-  gap: 10px;
-  margin-top: 20px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  width: 100%;
 }
 
-/* Картка */
 .card {
-  aspect-ratio: 3/4; 
-  background-color: #3a3a3a;
-  border: 2px solid #555;
-  border-radius: 8px;
+  aspect-ratio: 1;
+  background-color: #2f2f2f;
+  border-radius: 12px;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 2em;
+  font-size: 2.5em;
   cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+  user-select: none;
 }
 
 .card:hover {
-  border-color: #646cff;
+  transform: translateY(-4px);
+  background-color: #383838;
+  box-shadow: 0 8px 12px rgba(0,0,0,0.4);
+}
+
+
+.card.flipped {
+  background-color: #646cff;
+  transform: rotateY(180deg);
+  box-shadow: 0 0 15px rgba(100, 108, 255, 0.5);
+}
+
+.card.matched {
+  background-color: #4caf50;
+  opacity: 0.5;
+  transform: scale(0.95);
+  cursor: default;
+}
+
+.card-content {
+  pointer-events: none; 
+}
+
+/* Header Info */
+
+.game-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 20px;
+  font-size: 1.2em;
+  font-weight: bold;
+  color: #fff;
+}
+
+.restart-btn {
+  padding: 8px 12px;
+  font-size: 1em;
+  background-color: #333;
+  box-shadow: none;
+}
+
+.restart-btn:hover {
+  background-color: #444;
 }
