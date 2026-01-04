@@ -7,18 +7,18 @@ import { useTimer } from '../hooks/useTimer';
 const GamePage = ({ settings, onBack }) => {
     const { 
         cards, flippedCards, matchedCards, handleCardClick, 
-        isGameFinished, moves, restartGame 
+        isGameFinished, moves, restartGame, isLoading, error 
     } = useGame(settings);
 
     const { seconds, startTimer, stopTimer, resetTimer, formatTime } = useTimer();
 
-    // Запускаємо таймер при старті (і скидаємо при рестарті)
     useEffect(() => {
-        startTimer();
+        if (!isLoading && !error) {
+            startTimer();
+        }
         return () => stopTimer();
-    }, []);
+    }, [isLoading, error]); 
 
-    // Зупиняємо таймер, коли гра закінчена
     useEffect(() => {
         if (isGameFinished) stopTimer();
     }, [isGameFinished]);
@@ -26,7 +26,6 @@ const GamePage = ({ settings, onBack }) => {
     const handleRestart = () => {
         restartGame();
         resetTimer();
-        startTimer();
     };
 
     return (
@@ -43,20 +42,26 @@ const GamePage = ({ settings, onBack }) => {
                 <button onClick={handleRestart} className="btn-small">🔄</button>
             </div>
 
-            {/* Сітка карток */}
-            <div className={`grid difficulty-${settings.difficulty}`}>
-                {cards.map((card) => (
-                    <Card
-                        key={card.id}
-                        item={card}
-                        isFlipped={flippedCards.includes(card.id)}
-                        isMatched={matchedCards.includes(card.id)}
-                        onClick={() => handleCardClick(card.id)}
-                    />
-                ))}
-            </div>
+            {isLoading ? (
+                <div className="loader">Завантаження персонажів... 🚀</div>
+            ) : error ? (
+                <div className="error-msg">Помилка: {error}</div>
+            ) : (
+                <div className={`grid difficulty-${settings.difficulty}`}>
+                    {cards.map((card) => (
+                        <Card
+                            key={card.id}
+                            item={card}
 
-            {/* Модальне вікно перемоги */}
+                            isFlipped={flippedCards.includes(card.id) || matchedCards.includes(card.id)}
+
+                            isMatched={matchedCards.includes(card.id)}
+                            onClick={() => handleCardClick(card.id)}
+                        />
+                    ))}
+                </div>
+            )}
+
             <Modal isOpen={isGameFinished}>
                 <h2>🎉 Перемога! 🎉</h2>
                 <p>Чудова робота, <b>{settings.username}</b>!</p>

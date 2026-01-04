@@ -1,36 +1,53 @@
 import { useState, useEffect } from 'react';
 
-// Великий набір емодзі, щоб вистачило на складний рівень
-const EMOJIS = [
-    '💻', '🖥️', '⌨️', '🖱️', '📱', '🔋', '🔌', '💾', 
-    '💿', '📀', '🎥', '📷', '📹', '📽️', '📡', '🔭', 
-    '🔬', '💡', '🔦', '⏰', '⌚', '🕹️', '🎲', '🧩'
-];
-
 export const useGame = (settings) => {
     const [cards, setCards] = useState([]);
     const [flippedCards, setFlippedCards] = useState([]);
     const [matchedCards, setMatchedCards] = useState([]);
-    const [isGameFinished, setIsGameFinished] = useState(false);
     const [moves, setMoves] = useState(0);
+    const [isGameFinished, setIsGameFinished] = useState(false);
+    
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState(null);
 
-    const startGame = () => {
-        // Отримуємо кількість пар з налаштувань (або 8 за замовчуванням)
-        const pairsCount = settings ? Number(settings.difficulty) : 8;
-        
-        // Беремо потрібну кількість унікальних іконок
-        const selectedEmojis = EMOJIS.slice(0, pairsCount);
-
-        // Створюємо пари
-        const deck = [...selectedEmojis, ...selectedEmojis]
-            .sort(() => Math.random() - 0.5)
-            .map((emoji, index) => ({ id: index, emoji }));
-
-        setCards(deck);
-        setFlippedCards([]);
-        setMatchedCards([]);
-        setMoves(0);
+    const startGame = async () => {
+        setIsLoading(true);
+        setError(null);
         setIsGameFinished(false);
+        setMoves(0);
+        setMatchedCards([]);
+        setFlippedCards([]);
+        setCards([]);
+
+        try {
+            const pairsCount = settings ? Number(settings.difficulty) : 8;
+            
+            // Робимо запит на сервер (беремо випадкову сторінку, щоб персонажі були різні)
+            const randomPage = Math.floor(Math.random() * 30) + 1;
+            const response = await fetch(`https://rickandmortyapi.com/api/character?page=${randomPage}`);
+            
+            if (!response.ok) throw new Error('Не вдалося завантажити дані');
+            
+            const data = await response.json();
+
+            // 2. Беремо потрібну кількість персонажів з отриманих даних
+            const initialItems = data.results.slice(0, pairsCount);
+
+            // 3. Формуємо пари (кожен персонаж двічі)
+            const deck = [...initialItems, ...initialItems]
+                .sort(() => Math.random() - 0.5)
+                .map((item, index) => ({
+                    id: index,
+                    content: item.image, 
+                    name: item.name      
+                }));
+
+            setCards(deck);
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const handleCardClick = (id) => {
@@ -44,7 +61,7 @@ export const useGame = (settings) => {
             const card1 = cards.find(c => c.id === newFlipped[0]);
             const card2 = cards.find(c => c.id === newFlipped[1]);
 
-            if (card1.emoji === card2.emoji) {
+            if (card1.content === card2.content) {
                 setMatchedCards(prev => [...prev, card1.id, card2.id]);
                 setFlippedCards([]);
             } else {
@@ -59,10 +76,19 @@ export const useGame = (settings) => {
         }
     }, [matchedCards, cards]);
 
-    // Перезапуск при зміні налаштувань
     useEffect(() => {
         startGame();
     }, [settings]);
 
-    return { cards, flippedCards, matchedCards, handleCardClick, isGameFinished, moves, restartGame: startGame };
+    return { 
+        cards, 
+        flippedCards, 
+        matchedCards, 
+        handleCardClick, 
+        isGameFinished, 
+        moves, 
+        restartGame: startGame,
+        isLoading, 
+        error     
+    };
 };

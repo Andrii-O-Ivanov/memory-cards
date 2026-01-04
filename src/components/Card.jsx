@@ -1,22 +1,19 @@
 import React from 'react';
-import '../index.css';
 
 const Card = ({ item, isFlipped, isMatched, onClick }) => {
-    
-    // Показуємо картинку, якщо картка перевернута АБО вже знайдена
-    const showContent = isFlipped || isMatched;
-
     return (
         <div 
             className={`card ${isFlipped ? 'flipped' : ''} ${isMatched ? 'matched' : ''}`}
             onClick={onClick}
         >
-            <div className="card-content">
-                {/* Якщо showContent true - показуємо картинку, інакше - знак питання */}
-                {showContent ? item.emoji : '?'}
+            <div className="card-inner">
+                <div className="card-front">?</div>
+                <div className="card-back">
+                    <img src={item.content} alt={item.name} />
+                </div>
             </div>
         </div>
     );
 };
-
+ 
 export default Card;

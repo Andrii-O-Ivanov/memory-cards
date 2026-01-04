@@ -23,7 +23,7 @@ export const useTimer = () => {
         return () => clearInterval(intervalRef.current);
     }, [isRunning]);
 
-    // Форматуємо час як MM:SS (наприклад 01:25)
+    // Форматуємо час 
     const formatTime = () => {
         const getSeconds = `0${seconds % 60}`.slice(-2);
         const minutes = Math.floor(seconds / 60);
