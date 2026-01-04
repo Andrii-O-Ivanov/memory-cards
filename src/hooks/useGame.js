@@ -6,11 +6,13 @@ export const useGame = (settings) => {
     const [matchedCards, setMatchedCards] = useState([]);
     const [moves, setMoves] = useState(0);
     const [isGameFinished, setIsGameFinished] = useState(false);
-    
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
 
     const startGame = async () => {
+        // Якщо складність не передали, не запускаємось
+        if (!settings || !settings.difficulty) return;
+
         setIsLoading(true);
         setError(null);
         setIsGameFinished(false);
@@ -20,26 +22,22 @@ export const useGame = (settings) => {
         setCards([]);
 
         try {
-            const pairsCount = settings ? Number(settings.difficulty) : 8;
-            
-            // Робимо запит на сервер (беремо випадкову сторінку, щоб персонажі були різні)
+            const pairsCount = Number(settings.difficulty);
+            // Запит на API
             const randomPage = Math.floor(Math.random() * 30) + 1;
             const response = await fetch(`https://rickandmortyapi.com/api/character?page=${randomPage}`);
             
             if (!response.ok) throw new Error('Не вдалося завантажити дані');
             
             const data = await response.json();
-
-            // 2. Беремо потрібну кількість персонажів з отриманих даних
             const initialItems = data.results.slice(0, pairsCount);
 
-            // 3. Формуємо пари (кожен персонаж двічі)
             const deck = [...initialItems, ...initialItems]
                 .sort(() => Math.random() - 0.5)
                 .map((item, index) => ({
                     id: index,
                     content: item.image, 
-                    name: item.name      
+                    name: item.name
                 }));
 
             setCards(deck);
@@ -78,17 +76,11 @@ export const useGame = (settings) => {
 
     useEffect(() => {
         startGame();
-    }, [settings]);
+    }, [settings.difficulty]); 
 
     return { 
-        cards, 
-        flippedCards, 
-        matchedCards, 
-        handleCardClick, 
-        isGameFinished, 
-        moves, 
-        restartGame: startGame,
-        isLoading, 
-        error     
+        cards, flippedCards, matchedCards, handleCardClick, 
+        isGameFinished, moves, restartGame: startGame, 
+        isLoading, error 
     };
 };

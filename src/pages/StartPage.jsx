@@ -1,31 +1,56 @@
-import { useForm } from "react-hook-form";
+import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { setGameSettings } from '../store/gameSlice';
 
-const StartPage = ({ onStart }) => {
-    const { register, handleSubmit, formState: { errors } } = useForm();
+const StartPage = () => {
+    const [username, setUsername] = useState('');
+    const [difficulty, setDifficulty] = useState('12');
+    const [error, setError] = useState('');
+    
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
-    const onSubmit = (data) => {
-        // Передаємо дані (ім'я та складність) в App
-        onStart(data);
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        
+        if (!username.trim()) {
+            setError("Введіть ім'я, будь ласка!");
+            return;
+        }
+
+        if (username.length < 3) {
+            setError("Ім'я має бути не менше 3 літер");
+            return;
+        }
+
+        dispatch(setGameSettings({ username, difficulty }));
+        navigate('/game');
     };
 
     return (
-        <div className="page start-page">
+        <div className="page">
             <h1>🧠 Memory Game</h1>
             <p className="subtitle">Тренуй свою пам'ять!</p>
-            
-            <form onSubmit={handleSubmit(onSubmit)} className="settings-form">
+
+            <form onSubmit={handleSubmit} className="settings-form">
                 <div className="form-group">
                     <label>Ім'я гравця:</label>
                     <input 
-                        {...register("username", { required: "Введіть ім'я!" })} 
-                        placeholder="Ваше ім'я..."
+                        type="text" 
+                        placeholder="Ваше ім'я..." 
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
                     />
-                    {errors.username && <span className="error">{errors.username.message}</span>}
+                    {error && <span className="error">{error}</span>}
                 </div>
 
                 <div className="form-group">
                     <label>Рівень складності:</label>
-                    <select {...register("difficulty")}>
+                    <select 
+                        value={difficulty} 
+                        onChange={(e) => setDifficulty(e.target.value)}
+                    >
                         <option value="6">Новачок (12 карток)</option>
                         <option value="8">Аматор (16 карток)</option>
                         <option value="12">Профі (24 картки)</option>
@@ -33,6 +58,16 @@ const StartPage = ({ onStart }) => {
                 </div>
 
                 <button type="submit" className="btn-primary">Почати гру 🚀</button>
+                
+                {/* Кнопка переходу на рекорди */}
+                <button 
+                    type="button" 
+                    className="btn-secondary" 
+                    style={{ marginTop: '10px' }}
+                    onClick={() => navigate('/leaderboard')}
+                >
+                    🏆 Таблиця Рекордів
+                </button>
             </form>
         </div>
     );

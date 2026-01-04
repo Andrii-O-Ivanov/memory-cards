@@ -1,10 +1,19 @@
 import React, { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import Card from '../components/Card';
 import Modal from '../components/Modal';
 import { useGame } from '../hooks/useGame';
 import { useTimer } from '../hooks/useTimer';
+import { resetGame, finishGame } from '../store/gameSlice'; // Імпортуємо finishGame
 
-const GamePage = ({ settings, onBack }) => {
+const GamePage = () => {
+    const { username, difficulty } = useSelector((state) => state.game);
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    const settings = { username, difficulty };
+
     const { 
         cards, flippedCards, matchedCards, handleCardClick, 
         isGameFinished, moves, restartGame, isLoading, error 
@@ -13,14 +22,27 @@ const GamePage = ({ settings, onBack }) => {
     const { seconds, startTimer, stopTimer, resetTimer, formatTime } = useTimer();
 
     useEffect(() => {
-        if (!isLoading && !error) {
+        if (!username) {
+            navigate('/');
+        }
+    }, [username, navigate]);
+
+    useEffect(() => {
+        if (!isLoading && !error && username) {
             startTimer();
         }
         return () => stopTimer();
-    }, [isLoading, error]); 
+    }, [isLoading, error, username]);
 
+    // Коли гра завершилась - зупиняємо таймер і зберігаємо результат
     useEffect(() => {
-        if (isGameFinished) stopTimer();
+        if (isGameFinished) {
+            stopTimer();
+            dispatch(finishGame({ 
+                time: seconds, 
+                moves: moves 
+            }));
+        }
     }, [isGameFinished]);
 
     const handleRestart = () => {
@@ -28,12 +50,17 @@ const GamePage = ({ settings, onBack }) => {
         resetTimer();
     };
 
+    const handleBackToMenu = () => {
+        dispatch(resetGame());
+        navigate('/');
+    };
+
     return (
         <div className="page game-page">
             <div className="header">
-                <button onClick={onBack} className="btn-small">⬅ Меню</button>
+                <button onClick={handleBackToMenu} className="btn-small">⬅ Меню</button>
                 <div className="stats-box">
-                    <div>Гравець: <b>{settings.username}</b></div>
+                    <div>Гравець: <b>{username}</b></div>
                     <div className="stats-row">
                         <span>⏳ {formatTime()}</span>
                         <span>👣 {moves}</span>
@@ -47,14 +74,12 @@ const GamePage = ({ settings, onBack }) => {
             ) : error ? (
                 <div className="error-msg">Помилка: {error}</div>
             ) : (
-                <div className={`grid difficulty-${settings.difficulty}`}>
+                <div className={`grid difficulty-${difficulty}`}>
                     {cards.map((card) => (
                         <Card
                             key={card.id}
                             item={card}
-
                             isFlipped={flippedCards.includes(card.id) || matchedCards.includes(card.id)}
-
                             isMatched={matchedCards.includes(card.id)}
                             onClick={() => handleCardClick(card.id)}
                         />
@@ -64,14 +89,14 @@ const GamePage = ({ settings, onBack }) => {
 
             <Modal isOpen={isGameFinished}>
                 <h2>🎉 Перемога! 🎉</h2>
-                <p>Чудова робота, <b>{settings.username}</b>!</p>
+                <p>Чудова робота, <b>{username}</b>!</p>
                 <div className="results-summary">
                     <p>Час: <b>{formatTime()}</b></p>
                     <p>Ходів: <b>{moves}</b></p>
                 </div>
                 <div className="modal-buttons">
                     <button onClick={handleRestart} className="btn-primary">Ще раз</button>
-                    <button onClick={onBack} className="btn-secondary">Вийти</button>
+                    <button onClick={handleBackToMenu} className="btn-secondary">Вийти</button>
                 </div>
             </Modal>
         </div>

@@ -3,6 +3,12 @@
   background-color: #1a1a1a;
   color: #fff;
   line-height: 1.5;
+  
+  --primary-color: #97ce4c;
+  --primary-hover: #7eb336;
+  --bg-dark: #242424;
+  --bg-card: #2f2f2f;
+  --text-on-primary: #1a1a1a;
 }
 
 body {
@@ -19,10 +25,11 @@ body {
   justify-content: center;
 }
 
+/* Основна структура та типографіка */
 .app {
   width: 100%;
   max-width: 600px;
-  background: #242424;
+  background: var(--bg-dark);
   padding: 2rem;
   border-radius: 16px;
   box-shadow: 0 10px 40px rgba(0,0,0,0.5);
@@ -31,7 +38,6 @@ body {
   flex-direction: column;
 }
 
-/* Структура сторінки та заголовки */
 .page {
   display: flex;
   flex-direction: column;
@@ -40,11 +46,16 @@ body {
   flex: 1;
 }
 
-h1 { color: #646cff; margin: 0; font-size: 2.5rem; }
-h2 { color: #4caf50; margin-top: 0; }
+h1 { 
+  color: var(--primary-color); 
+  margin: 0; 
+  font-size: 2.5rem; 
+  text-shadow: 0 0 10px rgba(151, 206, 76, 0.3);
+}
+
 .subtitle { color: #aaa; margin-bottom: 2rem; }
 
-/* Форма налаштувань */
+/* Форми та елементи вводу */
 .settings-form {
   width: 100%;
   max-width: 300px;
@@ -60,6 +71,7 @@ h2 { color: #4caf50; margin-top: 0; }
 }
 
 label { font-weight: bold; margin-bottom: 0.5rem; color: #ddd; }
+
 input, select {
   padding: 10px;
   border-radius: 8px;
@@ -68,7 +80,13 @@ input, select {
   color: white;
   font-size: 1rem;
 }
-input:focus, select:focus { border-color: #646cff; outline: none; }
+
+input:focus, select:focus { 
+  border-color: var(--primary-color); 
+  outline: none; 
+  box-shadow: 0 0 5px rgba(151, 206, 76, 0.5);
+}
+
 .error { color: #ff5252; font-size: 0.85rem; margin-top: 5px; }
 
 /* Кнопки */
@@ -77,18 +95,19 @@ button {
   border: none;
   font-weight: bold;
   border-radius: 8px;
-  transition: transform 0.1s;
+  transition: all 0.2s ease;
 }
+
 button:active { transform: scale(0.98); }
 
 .btn-primary {
-  background: #646cff;
-  color: white;
+  background: var(--primary-color);
+  color: var(--text-on-primary);
   padding: 12px;
   font-size: 1.1rem;
   width: 100%;
 }
-.btn-primary:hover { background: #535bf2; }
+.btn-primary:hover { background: var(--primary-hover); }
 
 .btn-secondary {
   background: transparent;
@@ -96,7 +115,7 @@ button:active { transform: scale(0.98); }
   color: #ddd;
   padding: 10px 20px;
 }
-.btn-secondary:hover { border-color: #777; }
+.btn-secondary:hover { border-color: #777; color: #fff; }
 
 .btn-small {
   background: #333;
@@ -116,20 +135,18 @@ button:active { transform: scale(0.98); }
   border-bottom: 1px solid #333;
 }
 
-.stats-box {
-  text-align: center;
-  font-size: 0.9rem;
-}
+.stats-box { text-align: center; font-size: 0.9rem; }
+
 .stats-row {
   display: flex;
   gap: 15px;
   justify-content: center;
   font-size: 1.1rem;
   font-weight: bold;
-  color: #646cff;
+  color: var(--primary-color);
 }
 
-/* Сітка карток */
+/* Система сітки карток */
 .grid {
   display: grid;
   gap: 10px;
@@ -142,7 +159,7 @@ button:active { transform: scale(0.98); }
 .grid.difficulty-8 { grid-template-columns: repeat(4, 1fr); }
 .grid.difficulty-12 { grid-template-columns: repeat(6, 1fr); }
 
-/* Стилі картки */
+/* Стилі компонентів картки */
 .card {
   aspect-ratio: 1;
   background-color: transparent;
@@ -154,7 +171,6 @@ button:active { transform: scale(0.98); }
   position: relative;
   width: 100%;
   height: 100%;
-  text-align: center;
   transition: transform 0.6s;
   transform-style: preserve-3d;
   border-radius: 12px;
@@ -180,25 +196,28 @@ button:active { transform: scale(0.98); }
   justify-content: center;
   align-items: center;
   overflow: hidden;
+  box-sizing: border-box;
 }
 
-/* Сорочка картки */
 .card-front {
-  background-color: #2f2f2f;
-  color: white;
+  background-color: var(--bg-card);
+  color: #fff;
   font-size: 2.5em;
   border: 2px solid #444;
   z-index: 2;
   transition: opacity 0.3s ease-in-out;
 }
 
-.card:hover .card-front { background-color: #383838; }
+.card:hover .card-front { 
+  background-color: #383838; 
+  border-color: var(--primary-color);
+}
 
-/* Картинка */
 .card-back {
-  background-color: #646cff;
+  background-color: var(--primary-color);
   transform: rotateY(180deg);
   z-index: 1;
+  border: 2px solid transparent; 
 }
 
 .card-back img {
@@ -208,29 +227,21 @@ button:active { transform: scale(0.98); }
 }
 
 .card.flipped .card-front,
-.card.matched .card-front {
-  opacity: 0;
-}
+.card.matched .card-front { opacity: 0; }
+.card.matched .card-inner { opacity: 0.6; }
 
-.card.matched .card-inner {
-    opacity: 0.6;
-}
-
-/* Лоадер */
+/* Індикатори завантаження та модальні вікна */
 .loader {
   font-size: 1.5rem;
-  color: #646cff;
+  color: var(--primary-color);
   font-weight: bold;
   animation: pulse 1s infinite;
 }
+
+@keyframes pulse { 0% { opacity: 0.5; } 100% { opacity: 1; } }
+
 .error-msg { color: #ff5252; font-size: 1.2rem; }
 
-@keyframes pulse {
-  0% { opacity: 0.5; }
-  100% { opacity: 1; }
-}
-
-/* Модальне вікно */
 .modal-overlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -269,3 +280,47 @@ button:active { transform: scale(0.98); }
 
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes slideUp { from { transform: translateY(20px); } to { transform: translateY(0); } }
+
+/* Таблиця рекордів */
+.leaderboard-table {
+  width: 100%;
+  max-width: 600px;
+  border-collapse: collapse;
+  background: #2a2a2a;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-top: 20px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  font-size: 0.95rem;
+}
+
+.leaderboard-table th, 
+.leaderboard-table td {
+  padding: 15px;
+  text-align: left;
+  border-bottom: 1px solid #444;
+}
+
+.leaderboard-table th {
+  background-color: #333;
+  color: var(--primary-color);
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+}
+
+.leaderboard-table tr:last-child td { border-bottom: none; }
+
+.leaderboard-table tr:hover {
+  background-color: #383838;
+  transition: background-color 0.2s ease;
+}
+
+@media (max-width: 500px) {
+  .leaderboard-table th, 
+  .leaderboard-table td {
+    padding: 10px 5px;
+    font-size: 0.85rem;
+  }
+}
