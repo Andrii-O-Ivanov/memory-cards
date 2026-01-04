@@ -1,35 +1,53 @@
 import React, { useEffect } from 'react';
 import Card from '../components/Card';
-import { useGame } from '../hooks/useGame'; 
-            <h1>Memory Cards</h1>
-const GamePage = ({ onFinish }) => {
-    const { 
-        cards, 
-        flippedCards, 
-        matchedCards, 
-        handleCardClick, 
-        isGameFinished, 
-        moves,
-        restartGame 
-    } = useGame();
+import Modal from '../components/Modal';
+import { useGame } from '../hooks/useGame';
+import { useTimer } from '../hooks/useTimer';
 
+const GamePage = ({ settings, onBack }) => {
+    const { 
+        cards, flippedCards, matchedCards, handleCardClick, 
+        isGameFinished, moves, restartGame 
+    } = useGame(settings);
+
+    const { seconds, startTimer, stopTimer, resetTimer, formatTime } = useTimer();
+
+    // Запускаємо таймер при старті (і скидаємо при рестарті)
     useEffect(() => {
-        if (isGameFinished) {
-            setTimeout(() => onFinish(moves), 1000);
-        }
-    }, [isGameFinished, onFinish, moves]);
+        startTimer();
+        return () => stopTimer();
+    }, []);
+
+    // Зупиняємо таймер, коли гра закінчена
+    useEffect(() => {
+        if (isGameFinished) stopTimer();
+    }, [isGameFinished]);
+
+    const handleRestart = () => {
+        restartGame();
+        resetTimer();
+        startTimer();
+    };
 
     return (
-        <div className="page">
-            <div className="game-info">
-                <span>Ходів: {moves}</span>
-                <button onClick={restartGame} className="restart-btn">🔄</button>
+        <div className="page game-page">
+            <div className="header">
+                <button onClick={onBack} className="btn-small">⬅ Меню</button>
+                <div className="stats-box">
+                    <div>Гравець: <b>{settings.username}</b></div>
+                    <div className="stats-row">
+                        <span>⏳ {formatTime()}</span>
+                        <span>👣 {moves}</span>
+                    </div>
+                </div>
+                <button onClick={handleRestart} className="btn-small">🔄</button>
             </div>
-            
-            <div className="grid">
+
+            {/* Сітка карток */}
+            <div className={`grid difficulty-${settings.difficulty}`}>
                 {cards.map((card) => (
-                    <Card 
-                        key={card.id} 
+                    <Card
+                        key={card.id}
                         item={card}
                         isFlipped={flippedCards.includes(card.id)}
                         isMatched={matchedCards.includes(card.id)}
@@ -37,6 +55,20 @@ const GamePage = ({ onFinish }) => {
                     />
                 ))}
             </div>
+
+            {/* Модальне вікно перемоги */}
+            <Modal isOpen={isGameFinished}>
+                <h2>🎉 Перемога! 🎉</h2>
+                <p>Чудова робота, <b>{settings.username}</b>!</p>
+                <div className="results-summary">
+                    <p>Час: <b>{formatTime()}</b></p>
+                    <p>Ходів: <b>{moves}</b></p>
+                </div>
+                <div className="modal-buttons">
+                    <button onClick={handleRestart} className="btn-primary">Ще раз</button>
+                    <button onClick={onBack} className="btn-secondary">Вийти</button>
+                </div>
+            </Modal>
         </div>
     );
 };
