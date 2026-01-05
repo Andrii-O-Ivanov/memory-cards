@@ -1,16 +1,61 @@
-# React + Vite
+# 🧠 Rick and Morty: Memory Game
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+### 🎮 [ВІДКРИТИ ГРУ ОНЛАЙН (DEMO)](https://andrii-o-ivanov.github.io/memory-cards/)
 
-Currently, two official plugins are available:
+Цей проєкт — це кросплатформна гра на розвиток пам'яті (Memory Cards), реалізована на базі бібліотеки React. Тематика гри присвячена персонажам мультсеріалу "Рік та Морті".
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+## 📸 Огляд інтерфейсу
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+**1. Головне меню**
+Екран авторизації гравця та вибору одного з трьох рівнів складності.
+![Головне меню](./screenshots/main-menu.png)
 
-## Expanding the ESLint configuration
+**2. Ігровий процес**
+Інтерактивне поле з картками персонажів, що завантажуються з API. Включає таймер та лічильник ходів.
+![Геймплей](./screenshots/gameplay.png)
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+**3. Результати гри**
+Модальне вікно з фінальною статистикою гравця після успішного завершення раунду.
+![Результати](./screenshots/result.png)
+
+**4. Зала слави (Leaderboard)**
+Таблиця найкращих результатів, реалізована за допомогою LocalStorage для збереження прогресу.
+![Зала слави](./screenshots/leaderboard.png)
+
+---
+
+## 🚀 Основні можливості та реалізація
+- **Робота з API:** Картки персонажів завантажуються динамічно з [The Rick and Morty API](https://rickandmortyapi.com/).
+- **Керування станом (State Management):** Використано **Redux Toolkit** для глобального керування ігровим циклом та списком рекордів.
+- **Рівні складності:**
+  - Новачок (6 пар)
+  - Аматор (8 пар)
+  - Профі (12 пар)
+- **Збереження даних:** Реалізовано постійне зберігання таблиці лідерів у **LocalStorage**.
+- **Розумне сортування:** Рекорди автоматично сортуються за складністю (пріоритет), мінімальним часом та кількістю ходів.
+- **Маршрутизація:** Використано **React Router (HashRouter)** для стабільної роботи переходів між сторінками на GitHub Pages.
+
+## 🛠 Технологічний стек
+- **Frontend:** React 18 + Vite
+- **State Management:** Redux Toolkit
+- **Routing:** React Router DOM
+- **Deployment:** GitHub Pages
+- **Styles:** Custom CSS3 (Dark Mode & Animations)
+
+## 💻 Як запустити проєкт локально
+Щоб розгорнути проєкт на локальній машині, виконайте наступні кроки:
+
+1. Клонуйте репозиторій:
+   ```bash
+   git clone https://github.com/Andrii-O-Ivanov/memory-cards.git
+2. Перейдіть у папку проєкту:
+    ```bash
+    cd memory-cards
+3. Встановіть необхідні залежності:
+    ```bash
+    npm install
+4. Запустіть сервер розробки:
+    ```bash
+    npm run dev
