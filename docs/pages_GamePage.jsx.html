@@ -1,0 +1,236 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title> pages/GamePage.jsx</title>
+
+  <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="./build/entry.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,400,700|Inconsolata,700" rel="stylesheet">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+  <link type="text/css" rel="stylesheet" href="https://jmblog.github.io/color-themes-for-google-code-prettify/themes/tomorrow-night.min.css">
+  <link type="text/css" rel="stylesheet" href="styles/app.min.css">
+  <link type="text/css" rel="stylesheet" href="styles/iframe.css">
+  <link type="text/css" rel="stylesheet" href="">
+  <script async defer src="https://buttons.github.io/buttons.js"></script>
+
+  
+</head>
+
+
+
+<body class="layout small-header">
+    <div id="stickyNavbarOverlay"></div>
+    
+
+<div class="top-nav">
+    <div class="inner">
+        <a id="hamburger" role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </a>
+        <div class="logo">
+            
+            
+        </div>
+        <div class="menu">
+            
+            <div class="navigation">
+                <a
+                    href="index.html"
+                    class="link"
+                >
+                    Documentation
+                </a>
+                
+                
+                
+            </div>
+        </div>
+    </div>
+</div>
+    <div id="main">
+        <div
+            class="sidebar "
+            id="sidebarNav"
+        >
+            
+            <nav>
+                
+                    <h2><a href="index.html">Documentation</a></h2><div class="category"><h3>Components</h3><ul><li><a href="Card.html">Card</a></li><li><a href="GamePage.html">GamePage</a></li><li><a href="Modal.html">Modal</a></li></ul><h3>Global</h3><ul><li><a href="global.html#gameSlice">gameSlice</a></li><li><a href="global.html#loadLeaderboard">loadLeaderboard</a></li><li><a href="global.html#useTimer">useTimer</a></li></ul></div>
+                
+            </nav>
+        </div>
+        <div class="core" id="main-content-wrapper">
+            <div class="content">
+                <header class="page-title">
+                    <p>Source</p>
+                    <h1>pages/GamePage.jsx</h1>
+                </header>
+                
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import Card from '../components/Card';
+import Modal from '../components/Modal';
+import { useGame } from '../hooks/useGame';
+import { useTimer } from '../hooks/useTimer';
+import { resetGame, finishGame } from '../store/gameSlice'; // Імпортуємо finishGame
+
+/**
+ * Головна сторінка ігрового процесу.
+ * Відповідає за відображення ігрового поля, управління таймером, взаємодію з глобальним станом (Redux)
+ * та виклик модального вікна при завершенні гри.
+ *
+ * @component
+ * @returns {JSX.Element} Сторінка з ігровим полем, статистикою (таймер, ходи) та логікою гри.
+ */
+const GamePage = () => {
+    const { username, difficulty } = useSelector((state) => state.game);
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    const settings = { username, difficulty };
+
+    const { 
+        cards, flippedCards, matchedCards, handleCardClick, 
+        isGameFinished, moves, restartGame, isLoading, error 
+    } = useGame(settings);
+
+    const { seconds, startTimer, stopTimer, resetTimer, formatTime } = useTimer();
+
+    useEffect(() => {
+        if (!username) {
+            navigate('/');
+        }
+    }, [username, navigate]);
+
+    useEffect(() => {
+        if (!isLoading &amp;&amp; !error &amp;&amp; username) {
+            startTimer();
+        }
+        return () => stopTimer();
+    }, [isLoading, error, username]);
+
+    // Коли гра завершилась - зупиняємо таймер і зберігаємо результат
+    useEffect(() => {
+        if (isGameFinished) {
+            stopTimer();
+            dispatch(finishGame({ 
+                time: seconds, 
+                moves: moves 
+            }));
+        }
+    }, [isGameFinished]);
+
+    /**
+     * Перезапускає гру та скидає таймер.
+     */
+    const handleRestart = () => {
+        restartGame();
+        resetTimer();
+    };
+
+    /**
+     * Скидає поточний стан гри та повертає користувача на головне меню.
+     */
+    const handleBackToMenu = () => {
+        dispatch(resetGame());
+        navigate('/');
+    };
+
+    return (
+        &lt;div className="page game-page">
+            &lt;div className="header">
+                &lt;button onClick={handleBackToMenu} className="btn-small">⬅ Меню&lt;/button>
+                &lt;div className="stats-box">
+                    &lt;div>Гравець: &lt;b>{username}&lt;/b>&lt;/div>
+                    &lt;div className="stats-row">
+                        &lt;span>⏳ {formatTime()}&lt;/span>
+                        &lt;span>👣 {moves}&lt;/span>
+                    &lt;/div>
+                &lt;/div>
+                &lt;button onClick={handleRestart} className="btn-small">🔄&lt;/button>
+            &lt;/div>
+
+            {isLoading ? (
+                &lt;div className="loader">Завантаження персонажів... 🚀&lt;/div>
+            ) : error ? (
+                &lt;div className="error-msg">Помилка: {error}&lt;/div>
+            ) : (
+                &lt;div className={`grid difficulty-${difficulty}`}>
+                    {cards.map((card) => (
+                        &lt;Card
+                            key={card.id}
+                            item={card}
+                            isFlipped={flippedCards.includes(card.id) || matchedCards.includes(card.id)}
+                            isMatched={matchedCards.includes(card.id)}
+                            onClick={() => handleCardClick(card.id)}
+                        />
+                    ))}
+                &lt;/div>
+            )}
+
+            &lt;Modal isOpen={isGameFinished}>
+                &lt;h2>🎉 Перемога! 🎉&lt;/h2>
+                &lt;p>Чудова робота, &lt;b>{username}&lt;/b>!&lt;/p>
+                &lt;div className="results-summary">
+                    &lt;p>Час: &lt;b>{formatTime()}&lt;/b>&lt;/p>
+                    &lt;p>Ходів: &lt;b>{moves}&lt;/b>&lt;/p>
+                &lt;/div>
+                &lt;div className="modal-buttons">
+                    &lt;button onClick={handleRestart} className="btn-primary">Ще раз&lt;/button>
+                    &lt;button onClick={handleBackToMenu} className="btn-secondary">Вийти&lt;/button>
+                &lt;/div>
+            &lt;/Modal>
+        &lt;/div>
+    );
+};
+
+export default GamePage;</code></pre>
+        </article>
+    </section>
+
+
+
+
+            </div>
+            
+            <footer class="footer">
+                <div class="content has-text-centered">
+                    <p>Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.5</a></p>
+                    <p class="sidebar-created-by">
+                        <a href="https://github.com/SoftwareBrothers/better-docs" target="_blank">BetterDocs theme</a> provided with <i class="fas fa-heart"></i> by
+                        <a href="http://softwarebrothers.co" target="_blank">SoftwareBrothers - JavaScript Development Agency</a>
+                    </p>
+                </div>
+            </footer>
+            
+        </div>
+        <div id="side-nav" class="side-nav">
+        </div>
+    </div>
+<script src="scripts/app.min.js"></script>
+<script>PR.prettyPrint();</script>
+<script src="scripts/linenumber.js"> </script>
+
+
+</body>
+</html>

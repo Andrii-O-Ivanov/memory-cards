@@ -7,6 +7,14 @@ import { useGame } from '../hooks/useGame';
 import { useTimer } from '../hooks/useTimer';
 import { resetGame, finishGame } from '../store/gameSlice'; // Імпортуємо finishGame
 
+/**
+ * Головна сторінка ігрового процесу.
+ * Відповідає за відображення ігрового поля, управління таймером, взаємодію з глобальним станом (Redux)
+ * та виклик модального вікна при завершенні гри.
+ *
+ * @component
+ * @returns {JSX.Element} Сторінка з ігровим полем, статистикою (таймер, ходи) та логікою гри.
+ */
 const GamePage = () => {
     const { username, difficulty } = useSelector((state) => state.game);
     const dispatch = useDispatch();
@@ -45,11 +53,17 @@ const GamePage = () => {
         }
     }, [isGameFinished]);
 
+    /**
+     * Перезапускає гру та скидає таймер.
+     */
     const handleRestart = () => {
         restartGame();
         resetTimer();
     };
 
+    /**
+     * Скидає поточний стан гри та повертає користувача на головне меню.
+     */
     const handleBackToMenu = () => {
         dispatch(resetGame());
         navigate('/');
